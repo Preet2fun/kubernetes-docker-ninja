@@ -1,0 +1,8 @@
+# this object will create new namespace called clud
+
+
+apiVersion: v1
+kind: Namespace
+metadata: 
+  name: cloud
+
