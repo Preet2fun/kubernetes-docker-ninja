@@ -1,0 +1,60 @@
+# direct command to start swarm service 
+# Service creation for container application
+
+#1) Mysql
+
+#docker service create \
+#           --replicas 2 \
+#		   -p 3306:3306
+#          --name mysql_motadata_8 \
+#           --network net1 \
+#           --env MYSQL_ROOT_PASSWORD=M!nd@123 \
+#           --env MYSQL_DATABASE=motadata8 \
+#          mysql:latest
+
+# docker service logs mysql_5_7_mysql
+
+
+# docker stack deploy --compose-file docker-mysql-8-compose.yml mysql_8
+version: '3.8'
+ 
+services:
+  mysql:
+    image: mysql:8.0.21
+    networks:
+      - database
+    deploy:
+      placement:
+        constraints:
+          - node.role==worker
+      replicas: 2
+    environment:
+      MYSQL_DATABASE: 'motadata8'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'qauser'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: 'qa@password'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'M!nd@123'
+      MYSQL_DATABASE: "motadata8"
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - '3307:3306'
+    #expose:
+      # Opens port 3306 on the container
+      #- '3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+
+# Names our volume
+volumes:
+   mysql_data:
+
+networks:
+  database:
+   driver: overlay
+#   external: true
+    attachable: true
+
+
