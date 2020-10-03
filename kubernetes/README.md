@@ -71,3 +71,18 @@ kubectl get pod resource-example -o yaml >> resource-request-limits-pod.yaml
 ########################################## Deployments ###########################################
 
 #This is the simplest way to create deployment via imperative kubectl run command
+
+
+########################################## ReplicaSets ###########################################
+#imperative commands for scale up/down of replicaset
+kubectl scale replicaset <replicaset-name> --replicase=3
+
+#Scaling based on CPU usage is the most common use case for Pod autoscaling and you can use below commad for same
+kubectl autoscale rs kuard --min=2 --max=5 --cpu-percent=80
+
+# to see horizontal pod autoscaling(hpa) use below commnd
+kubectl get hpa
+
+#If you don’t want to delete the Pods that are being managed by the ReplicaSet, you
+#can set the --cascade flag to false to ensure only the ReplicaSet object is deleted and not the Pods:
+kubectl delete rs kuard --cascade=false
