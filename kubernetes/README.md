@@ -71,7 +71,54 @@ kubectl get pod resource-example -o yaml >> resource-request-limits-pod.yaml
 ########################################## Deployments ###########################################
 
 #This is the simplest way to create deployment via imperative kubectl run command
+# to get specific parameter using jsonpath we can use belwo command
+kubectl get deployment <name_of_deployment> -o jsonpath --template {.spec.selector.matchLabels}
 
+#for download of any running deployment into a YAML file use belwo command:
+kubectl get deployments kuard --export -o yaml > kuard-deployment.yaml
+kubectl replace -f kuard-deployment.yaml --save-config
+
+# Below are the diffrent command for deployment rollout
+# Rollback to the previous deployment
+kubectl rollout undo deployment/abc
+  
+# Check the rollout status of a daemonset
+kubectl rollout status daemonset/foo
+kubectl rollout history deployment/kuard
+
+Available Commands:
+  history     View rollout history
+  pause       Mark the provided resource as paused
+  restart     Restart a resource
+  resume      Resume a paused resource
+  status      Show the status of the rollout
+  undo        Undo a previous rollout
+
+#If you are in the middle of a rollout and you want to temporarily pause it for some
+#reason (e.g., if you start seeing weird behavior in your system and you want to investigate),
+#you can use the pause command:
+kubectl rollout pause deployments kuard
+deployment "kuard" paused
+
+#If, after investigation, you believe the rollout can safely proceed, you can use the
+#resume command to start up where you left off:
+kubectl rollout resume deployments kuard
+deployment "kuard" resumed
+
+#If you are interested in more details about a particular revision, you can add the
+# --revision flag to view details about that specific revision:
+kubectl rollout history deployment kuard --revision=2
+
+
+#you can roll back to a specific revision in the history using the flag: --to-revision
+kubectl rollout undo deployments kuard --to-revision=3
+deployment "kuard" rolled back
+
+#If you ever want to delete a deployment, you can do it either with the imperative command:
+kubectl delete deployments kuard
+
+#or using the declarative YAML file we created earlier:
+kubectl delete -f kuard-deployment.yaml
 
 ########################################## ReplicaSets ###########################################
 #imperative commands for scale up/down of replicaset
@@ -86,3 +133,18 @@ kubectl get hpa
 #If you don’t want to delete the Pods that are being managed by the ReplicaSet, you
 #can set the --cascade flag to false to ensure only the ReplicaSet object is deleted and not the Pods:
 kubectl delete rs kuard --cascade=false
+
+######################################### ConfigMaps and Secerets ###############################
+# below commnd will create configmaps imperative way,
+kubectl create configmap my-config --from-file=my-config.txt --from-literal=extra-param=extra-value --from-literal=another-param=another-value
+
+#Create a generic secret named kuard-tls using the create secret command, here kuard.crt and kuard.key are pre generated certificates
+$ kubectl create secret generic kuard-tls \
+--from-file=kuard.crt \
+--from-file=kuard.key
+
+# Use the create secret docker-registry to create this special kind of secret:
+$ kubectl create secret docker-registry my-image-pull-secret \
+--docker-username=<username> \
+--docker-password=<password> \
+--docker-email=<email-address>
