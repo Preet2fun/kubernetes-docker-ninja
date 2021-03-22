@@ -1,0 +1,8 @@
+# to know the Ip address of pod
+kubect get pods -o json -n yaobank | jq '.itemsl[
+].status.podIP'
+# how  to connect to pod
+kubectl exec -it < pod name > /bin/bash -n < namespace >
+
+# to know specific pod name
+kubectl get pods -n yaobank -l  app=customor -o name
